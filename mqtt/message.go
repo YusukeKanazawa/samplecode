@@ -1,0 +1,23 @@
+package mqtt
+
+const (
+	RESERVED0 uint8 = iota + 1
+	CONNECT
+	CONNACK
+	PUBLISH
+	PUBACK
+	PUBREC
+	PUBREL
+	PUBCOMP
+	SUBSCRIBE
+	SUBACK
+	UNSUBSCRIBE
+	UNSUBACK
+	PINGREQ
+	PINGRESP
+	DISCONNECT
+	RESERVED15
+)
+
+type message struct {
+}
