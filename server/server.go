@@ -14,6 +14,10 @@ func (s *server) Listen(){
     log.Fatal(err)
   }
   log.Println("Server Listing on tcp 2000")
+
+  broker := NewBroker()
+  go broker.wireMessage()
+
   defer l.Close()
   for {
     // Wait for a connection.
@@ -22,7 +26,7 @@ func (s *server) Listen(){
       log.Fatal(err)
       os.Exit(1)
     }
-    go handleClient(conn)
+    go handleClient(conn, broker)
   }
 }
 

@@ -16,8 +16,8 @@ const (
 func handleClient(c net.Conn) {
 	log.Printf("Connected. IP:%s\n", c.LocalAddr())
   
-  client := mqtt.NewClient()
-  go client.Receive()
+  sess := newSession()
+  go sess.receive()
 
 	defer c.Close()
 	buff := make([]byte, BUFFER_SIZE)
@@ -29,7 +29,7 @@ func handleClient(c net.Conn) {
   			log.Fatal(err.Error())
   			os.Exit(1)
   		}
-      client.Rcv <- buff[:l]
+      sess.rcv <- buff[:l]
       
 		//c.SetWriteDeadline(time.Now().Add(KEEP_ALIVE * time.Second))
 	}
