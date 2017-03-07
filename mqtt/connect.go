@@ -35,7 +35,7 @@ func newConnectFlag(b byte) *connectFlag {
 }
 
 // header
-//   Protocol: Only "MQIspd" ver "3" as MQTTv3.1 
+//   Protocol: Only "MQIspd" ver "3" as MQTTv3.1
 //             or "MQTT" ver "4" as MQTTv3.1.1 supported.
 //   keepAlive: 10 minutes default.
 //
@@ -67,7 +67,7 @@ func (m *connectMsg) decode(b []byte) {
 	cur := 0
 
 	// variable header
-  l:=0	
+  l:=0
 	m.Protocol, l = decodeUTF8(b[cur:])
 	cur += l
 
@@ -87,7 +87,7 @@ func (m *connectMsg) decode(b []byte) {
 	m.ClientId, l = decodeUTF8(b[cur:])
 	cur += l
 
-	// TODO: length uder 23 check.
+	// TODO: length under 23 check.
 	if m.ConnectFlag.WillFlag {
 		topic, l := decodeUTF8(b[cur:])
 		cur += l
@@ -114,4 +114,7 @@ func (m *connectMsg) decode(b []byte) {
 
 func (m *connectMsg)encode()[]byte{
   return make([]byte,0)
+}
+func (m *connectMsg) getType() msgType{
+	return CONNECT
 }

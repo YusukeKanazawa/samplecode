@@ -4,19 +4,20 @@ import (
 	"log"
 	"net"
 	"os"
+	"strconv"
 )
 type server struct {
+	port int
 }
 func (s *server) Listen(){
   // Listen on TCP port 2000 on all interfaces.
-  l, err := net.Listen("tcp", ":2000")
+  l, err := net.Listen("tcp", ":" + strconv.Itoa(s.port))
   if err != nil {
     log.Fatal(err)
   }
   log.Println("Server Listing on tcp 2000")
 
-  broker := NewBroker()
-  go broker.wireMessage()
+  //broker := NewBroker()
 
   defer l.Close()
   for {
@@ -26,10 +27,12 @@ func (s *server) Listen(){
       log.Fatal(err)
       os.Exit(1)
     }
-    go handleClient(conn, broker)
+    go handleClient(conn)
   }
 }
 
-func New() *server{
-  return &server{}
+func New(port int) *server{
+  return &server{
+		port: port,
+	}
 }

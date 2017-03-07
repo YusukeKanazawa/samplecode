@@ -13,27 +13,37 @@ const (
 
 type connackMsg struct {
 	*fixedHeader
+	isCleanSession bool
 	returnCode caRC
 }
 
-func newConnackMsg(rc caRC) *connackMsg{
+func newConnackMsg(rc caRC, cleanSession bool) *connackMsg{
 	return &connackMsg{
+		fixedHeader: newFixedHeader(CONNACK),
+		isCleanSession: cleanSession,
 		returnCode: rc,
 	}
 }
 
-func (m *connackMsg) decode(b []byte) {
-}
+func (m *connackMsg) decode(b []byte) {}
 
 // payload
-//   1: reserved
+//              Session PresentFlag
+//   1:         |
+//      0000 000X
 //   2: return code
-func (m *connackMsg) encode() []byte {
+func (msg *connackMsg) encode() []byte {
 	buff := make([]byte, 0, 4)
-	buff = append(buff, m.fixedHeader.encode(2)...)
-	return append(buff, 0x00, byte(m.returnCode))
+	buff = append(buff, msg.fixedHeader.encode(2)...)
+	if msg.isCleanSession {
+		buff = append(buff, 0x01)
+	}else{
+		buff = append(buff, 0x00)
+	}
+	return append(buff, byte(msg.returnCode))
 }
 
 
-func (m *connackMsg) proc(){
+func (m *connackMsg) getType() msgType{
+	return CONNACK
 }

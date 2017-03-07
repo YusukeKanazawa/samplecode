@@ -5,6 +5,6 @@ import (
 )
 
 func main() {
-	svr := server.New()
+	svr := server.New(1883)
 	svr.Listen()
 }

@@ -24,16 +24,14 @@ const (
 )
 
 type msgType uint8
-
 type message interface {
 	decode([]byte)
 	encode() []byte
+	getType() msgType
 }
-
 func NewMessage(b []byte) message {
 	var msg message
 	head, l := decodeFixedHeader(b)
-
 	switch head.msgType {
 	case RESERVED0:
 	case CONNECT: // client -> server
@@ -60,8 +58,7 @@ func NewMessage(b []byte) message {
 	case UNSUBSCRIBE:
 	case UNSUBACK:
 	case PINGREQ: // client -> server
-		//fmt.Println("[trace] create pingreq message object")
-		//msg = NewPingreqMsg()
+		msg = newPingreqMsg()
 	case PINGRESP: // server -> client
 		//fmt.Println("[trace] create pingresp message object")
 	case DISCONNECT: // client -> server
@@ -71,6 +68,7 @@ func NewMessage(b []byte) message {
 	msg.decode(b[l:])
 	return msg
 }
+
 
 type fixedHeader struct {
 	msgType msgType
@@ -90,6 +88,11 @@ func decodeFixedHeader(b []byte) (*fixedHeader, int) {
 		remain:  remain,
 	}, 1 + l
 }
+func newFixedHeader(msgType msgType)*fixedHeader{
+	return &fixedHeader{
+		msgType: msgType,
+	}
+}
 func (h *fixedHeader) encode(l uint32) []byte {
 	buff := make([]byte, 0, 5)
 
@@ -103,7 +106,8 @@ func (h *fixedHeader) encode(l uint32) []byte {
 	}
 
 	buff = append(buff, b)
-	return append(buff, encodeRemain(l)...)
+	buff = append(buff, encodeRemain(l)...)
+	return buff
 }
 
 func decodeRemain(b []byte) (uint32, int) {
@@ -136,15 +140,4 @@ func encodeRemain(remain uint32) []byte {
 		}
 	}
 	return b
-}
-
-// decode UTF8 string with length.
-// 0:LENGTH MSB
-// 1:LENGTH LSB
-// 2: string
-// n: ...
-func decodeUTF8(b []byte) (string, int) {
-	l := int(b[0]<<8 + b[1])
-	str := b[2 : l+2]
-	return string(str), l + 2
 }
